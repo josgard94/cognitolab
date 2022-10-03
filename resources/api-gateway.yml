@@ -1,0 +1,40 @@
+Resources:
+  ApiGatewayRestApi:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: ${self:service}-api-${self:custom.currentStage}
+      EndpointConfiguration:
+        Types:
+          - EDGE
+      Policy: ""
+  APIGatewayAuthorizer:
+    DependsOn:
+      - ApiGatewayRestApi
+    Type: "AWS::ApiGateway::Authorizer"
+    Properties:
+      Name: ${self:service}-cognito-authorizer-${self:custom.currentStage}
+      IdentitySource: method.request.header.Authorization
+      RestApiId:
+        Ref: ApiGatewayRestApi
+      Type: COGNITO_USER_POOLS
+      ProviderARNs:
+        - Fn::GetAtt: [CognitoUserPool, Arn]
+
+Outputs:
+  ApiGatewayRestApiId:
+    Value:
+      Ref: ApiGatewayRestApi
+    Export:
+      Name: ${self:custom.currentStage}-ExtApiGatewayRestApiId
+  ApiGatewayRestApiRootResourceId:
+    Value:
+      Fn::GetAtt:
+        - ApiGatewayRestApi
+        - RootResourceId
+    Export:
+      Name: ${self:custom.currentStage}-ExtApiGatewayRestApiRootResourceId
+  ApiAuthorizerId:
+    Value:
+      Ref: APIGatewayAuthorizer
+    Export:
+      Name: ${self:custom.currentStage}-ApiAuthorizerId

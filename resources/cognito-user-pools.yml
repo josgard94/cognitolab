@@ -1,0 +1,38 @@
+Resources:
+  CognitoUserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      MfaConfiguration: OFF
+      UserPoolName: ${self:custom.userPoolName}
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: False
+          RequireNumbers: True
+          RequireSymbols: False
+          RequireUppercase: True
+      AutoVerifiedAttributes: 
+        - email
+      EmailVerificationMessage: "Utiliza el siguiente código {####}"
+      EmailVerificationSubject: "Código de Activación"
+  CognitoUserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: ${self:custom.userPoolClientName}
+      GenerateSecret: False
+      UserPoolId:
+        Ref: CognitoUserPool
+
+Outputs:
+  UserPoolId:
+    Value:
+      Ref: CognitoUserPool
+    Export:
+      Name: ${self:custom.currentStage}-UserPoolId
+  UserPoolClientId:
+    Value:
+      Ref: CognitoUserPoolClient
+    Export:
+      Name: ${self:custom.currentStage}-UserPoolClientId

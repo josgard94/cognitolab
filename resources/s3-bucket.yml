@@ -1,0 +1,11 @@
+Resources:
+  BucketCognitoLab:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:service}-cognitolab-${self:custom.currentStage}
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true

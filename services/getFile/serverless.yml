@@ -1,0 +1,50 @@
+service: signedurl
+
+provider:
+  name: aws
+  region: us-east-1
+  stage: ${self:custom.currentStage}
+  runtime: nodejs12.x
+  role:
+    'Fn::ImportValue': LambdaCognitoLab-default-${self:custom.currentStage}
+  apiGateway:
+    restApiId:
+      'Fn::ImportValue': ${self:custom.currentStage}-ExtApiGatewayRestApiId
+    restApiRootResourceId:
+      'Fn::ImportValue': ${self:custom.currentStage}-ExtApiGatewayRestApiRootResourceId
+  environment:
+    env: ${self:custom.currentStage}
+    userPoolId: ${self:custom.userPoolId}
+    clientId: ${self:custom.clientId}
+  profile: training
+
+custom:
+  currentStage: ${file(../../serverless.yml):custom.currentStage}
+  authorizerId:
+    'Fn::ImportValue': ${self:custom.currentStage}-ApiAuthorizerId
+  userPoolId:
+    'Fn::ImportValue': ${self:custom.currentStage}-UserPoolId
+  clientId:
+    'Fn::ImportValue': ${self:custom.currentStage}-UserPoolClientId
+  bundle:
+    sourcemaps: false
+    linting: false
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+
+functions:
+  getSignedUrl:
+    name: getSignedUrl-${self:custom.currentStage}
+    handler: getSignedUrl/index.getSignedUrl
+    events:
+      - http:
+          path: /getsignedurl
+          method: GET
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${self:custom.authorizerId}
+          cors: true
+
+  

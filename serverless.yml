@@ -1,0 +1,25 @@
+service: cognitolab
+
+provider:
+  name: aws
+  region: ${self:custom.region}
+  stage: ${self:custom.currentStage}
+  runtime: nodejs12.x
+  environment:
+    env: ${self:custom.currentStage}
+    userPoolName: ${self:custom.currentStage}-user-pool-${self:service}
+    userPoolClientName: ${self:custom.currentStage}-user-pool-client-${self:service}
+  profile: training
+
+custom:
+  currentStage: dev
+  region: us-east-1
+  userPoolClientName: ${self:custom.currentStage}-user-pool-client-${self:service}
+  userPoolName: ${self:custom.currentStage}-user-pool-${self:service} 
+
+resources:
+  - ${file(resources/iam-role.yml)}
+  - ${file(resources/api-gateway.yml)}
+  - ${file(resources/api-gateway-errors.yml)}
+  - ${file(resources/cognito-user-pools.yml)}
+  - ${file(resources/s3-bucket.yml)}

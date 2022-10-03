@@ -1,0 +1,35 @@
+Resources:
+  IAMDefaultRoleLambdas:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      RoleName: LambdaCognitoLab-default-${self:custom.currentStage}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaCognitoLab-default-${self:custom.currentStage}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-identity:*
+                  - cognito-idp:*
+                  - logs:*
+                  - s3:*
+                Resource: "*"
+
+Outputs:
+  DefaultLambdaRole:
+    Value:
+      Fn::GetAtt:
+        - IAMDefaultRoleLambdas
+        - Arn
+    Export:
+      Name: LambdaCognitoLab-default-${self:custom.currentStage}
